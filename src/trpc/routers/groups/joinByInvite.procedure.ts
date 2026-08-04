@@ -3,6 +3,7 @@ import { protectedProcedure } from '@/trpc/init'
 import { TRPCError } from '@trpc/server'
 import { randomId } from '@/lib/api'
 import { z } from 'zod'
+import { currentUser } from '@clerk/nextjs/server'
 
 export const joinByInviteProcedure = protectedProcedure
   .input(
@@ -31,8 +32,9 @@ export const joinByInviteProcedure = protectedProcedure
     }
 
     // Add user as MEMBER
+    const user = await currentUser()
     const newName =
-      participantName || ctx.user?.firstName || ctx.user?.username || 'Member'
+      participantName || user?.firstName || user?.username || 'Member'
 
     await prisma.participant.create({
       data: {
