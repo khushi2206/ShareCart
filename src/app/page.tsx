@@ -23,7 +23,7 @@ export default function HomePage() {
           </p>
           <div className="flex justify-center mt-4">
             <Button asChild size="lg" className="text-lg px-8">
-              <Link href="/groups">{t('Homepage.button.groups')}</Link>
+              <Link href="/dashboard">{t('Homepage.button.groups')}</Link>
             </Button>
           </div>
         </div>
