@@ -13,7 +13,7 @@ import { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { trpc } from '@/trpc/client'
 import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
+import { useToast } from '@/components/ui/use-toast'
 
 type Props = {
   group: Group
@@ -25,13 +25,14 @@ export function ShareButton({ group }: Props) {
   const [inviteCode, setInviteCode] = useState(group.inviteCode || '')
   const [showQrCode, setShowQrCode] = useState(false)
   const generateMutation = trpc.groups.generateInvite.useMutation()
+  const { toast } = useToast()
 
   // Fallback to /invite/ if baseUrl is not available yet
   const url = baseUrl ? `${baseUrl}/invite/${inviteCode}` : `https://sharecart-two.vercel.app/invite/${inviteCode}`
 
   const handleCopy = () => {
     navigator.clipboard.writeText(url)
-    toast.success('Invite link copied!')
+    toast({ title: 'Invite link copied!' })
   }
 
   const handleShare = () => {
@@ -49,10 +50,10 @@ export function ShareButton({ group }: Props) {
     try {
       const result = await generateMutation.mutateAsync({ groupId: group.id })
       setInviteCode(result.inviteCode)
-      toast.success('Invite link regenerated!')
+      toast({ title: 'Invite link regenerated!' })
       router.refresh()
     } catch (e) {
-      toast.error('Failed to regenerate invite link.')
+      toast({ title: 'Failed to regenerate invite link.', variant: 'destructive' })
     }
   }
 

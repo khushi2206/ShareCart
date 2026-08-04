@@ -1,9 +1,9 @@
 import { prisma } from '@/lib/prisma'
-import { publicProcedure } from '@/trpc/init'
+import { baseProcedure } from '@/trpc/init'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
-export const getDetailsByInviteCodeProcedure = publicProcedure
+export const getDetailsByInviteCodeProcedure = baseProcedure
   .input(
     z.object({
       inviteCode: z.string(),
