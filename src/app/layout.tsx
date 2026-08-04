@@ -1,3 +1,4 @@
+import { ClerkProvider } from '@clerk/nextjs'
 import { ApplePwaSplash } from '@/app/apple-pwa-splash'
 import { LocaleSwitcher } from '@/components/locale-switcher'
 import { ProgressBar } from '@/components/progress-bar'
@@ -84,24 +85,26 @@ export default async function RootLayout({
   const locale = await getLocale()
   const messages = await getMessages()
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <ApplePwaSplash icon="/logo-with-text.png" color="#027756" />
-      <body className="min-h-[100dvh] flex flex-col items-stretch bg-slate-50 bg-opacity-30 dark:bg-background">
-        <NextIntlClientProvider messages={messages}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            forcedTheme="dark"
-            enableSystem={false}
-            disableTransitionOnChange
-          >
-            <Suspense>
-              <ProgressBar />
-            </Suspense>
-            <Content>{children}</Content>
-          </ThemeProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang={locale} suppressHydrationWarning>
+        <ApplePwaSplash icon="/logo-with-text.png" color="#027756" />
+        <body className="min-h-[100dvh] flex flex-col items-stretch bg-slate-50 bg-opacity-30 dark:bg-background">
+          <NextIntlClientProvider messages={messages}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              forcedTheme="dark"
+              enableSystem={false}
+              disableTransitionOnChange
+            >
+              <Suspense>
+                <ProgressBar />
+              </Suspense>
+              <Content>{children}</Content>
+            </ThemeProvider>
+          </NextIntlClientProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }

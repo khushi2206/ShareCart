@@ -1,8 +1,8 @@
-import { getGroupExpenses } from '@/lib/api'
-import { baseProcedure } from '@/trpc/init'
+import { getGroupExpenseCount, getGroupExpenses, verifyGroupAccess } from '@/lib/api'
+import { protectedProcedure } from '@/trpc/init'
 import { z } from 'zod'
 
-export const listGroupExpensesProcedure = baseProcedure
+export const listGroupExpensesProcedure = protectedProcedure
   .input(
     z.object({
       groupId: z.string().min(1),
@@ -11,7 +11,8 @@ export const listGroupExpensesProcedure = baseProcedure
       filter: z.string().optional(),
     }),
   )
-  .query(async ({ input: { groupId, cursor = 0, limit = 10, filter } }) => {
+  .query(async ({ input: { groupId, cursor = 0, limit = 10, filter }, ctx }) => {
+    await verifyGroupAccess(groupId, ctx.userId)
     const expenses = await getGroupExpenses(groupId, {
       offset: cursor,
       length: limit + 1,

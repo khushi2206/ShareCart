@@ -17,6 +17,7 @@
     "generate-currency-data": "ts-node -T ./src/scripts/generateCurrencyData.ts"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.6.4",
     "@formatjs/intl-localematcher": "^0.5.4",
     "@hookform/resolvers": "^3.3.2",
     "@json2csv/plainjs": "^7.0.6",
@@ -61,6 +62,7 @@
     "react-dom": "^19.2.1",
     "react-hook-form": "^7.68.0",
     "react-intersection-observer": "^10.0.0",
+    "recharts": "^3.10.1",
     "server-only": "^0.0.1",
     "sharp": "^0.33.2",
     "superjson": "^2.2.1",

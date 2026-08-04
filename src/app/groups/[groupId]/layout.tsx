@@ -2,6 +2,9 @@ import { cached } from '@/app/cached-functions'
 import { Metadata } from 'next'
 import { PropsWithChildren } from 'react'
 import { GroupLayoutClient } from './layout.client'
+import { auth } from '@clerk/nextjs/server'
+import { verifyGroupAccess } from '@/lib/api'
+import { redirect } from 'next/navigation'
 
 type Props = {
   params: Promise<{
@@ -26,5 +29,17 @@ export default async function GroupLayout({
   params,
 }: PropsWithChildren<Props>) {
   const { groupId } = await params
+  
+  const { userId } = await auth()
+  if (!userId) {
+    redirect('/')
+  }
+  
+  try {
+    await verifyGroupAccess(groupId, userId)
+  } catch (error) {
+    redirect('/dashboard') // User does not have access
+  }
+
   return <GroupLayoutClient groupId={groupId}>{children}</GroupLayoutClient>
 }

@@ -1,15 +1,16 @@
-import { getGroupExpenses } from '@/lib/api'
+import { getGroupExpenses, verifyGroupAccess } from '@/lib/api'
 import {
   getBalances,
   getPublicBalances,
   getSuggestedReimbursements,
 } from '@/lib/balances'
-import { baseProcedure } from '@/trpc/init'
+import { protectedProcedure } from '@/trpc/init'
 import { z } from 'zod'
 
-export const listGroupBalancesProcedure = baseProcedure
+export const listGroupBalancesProcedure = protectedProcedure
   .input(z.object({ groupId: z.string().min(1) }))
-  .query(async ({ input: { groupId } }) => {
+  .query(async ({ input: { groupId }, ctx }) => {
+    await verifyGroupAccess(groupId, ctx.userId)
     const expenses = await getGroupExpenses(groupId)
     const balances = getBalances(expenses)
     const reimbursements = getSuggestedReimbursements(balances)

@@ -17,6 +17,7 @@ model Group {
   information  String?       @db.Text
   currency     String        @default("$")
   currencyCode String?
+  inviteCode   String?       @unique
   participants Participant[]
   expenses     Expense[]
   activities   Activity[]
@@ -26,6 +27,8 @@ model Group {
 model Participant {
   id              String           @id
   name            String
+  userId          String?
+  role            Role             @default(MEMBER)
   group           Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId         String
   expensesPaidBy  Expense[]
@@ -130,4 +133,63 @@ enum ActivityType {
   CREATE_EXPENSE
   UPDATE_EXPENSE
   DELETE_EXPENSE
+  CREATE_GROCERY
+  UPDATE_GROCERY
+  DELETE_GROCERY
+  PURCHASE_GROCERY
+  JOIN_GROUP
+  LEAVE_GROUP
+  UPLOAD_BILL
 }
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum GroceryItemStatus {
+  PENDING
+  PURCHASED
+}
+
+enum GroceryItemVisibility {
+  SHARED
+  PERSONAL
+}
+
+model GroceryItem {
+  id           String                @id @default(uuid())
+  name         String
+  quantity     Int                   @default(1)
+  unit         String?
+  status       GroceryItemStatus     @default(PENDING)
+  visibility   GroceryItemVisibility @default(SHARED)
+  groupId      String
+  createdBy    String
+  assignedTo   String?
+  purchasedAt  DateTime?
+  purchasedBy  String?
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+}
+
+enum NotificationType {
+  NEW_EXPENSE
+  NEW_GROCERY
+  MEMBER_JOINED
+  MEMBER_LEFT
+  BILL_UPLOADED
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  type      NotificationType
+  groupId   String
+  actorId   String
+  targetId  String?
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+}
+

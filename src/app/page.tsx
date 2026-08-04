@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { Github } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
@@ -22,15 +21,9 @@ export default function HomePage() {
               strong: (chunks) => <strong>{chunks}</strong>,
             })}
           </p>
-          <div className="flex gap-2">
-            <Button asChild>
+          <div className="flex justify-center mt-4">
+            <Button asChild size="lg" className="text-lg px-8">
               <Link href="/groups">{t('Homepage.button.groups')}</Link>
-            </Button>
-            <Button asChild variant="secondary">
-              <Link href="https://github.com/khushi2206/sharecart">
-                <Github className="w-4 h-4 mr-2" />
-                {t('Homepage.button.github')}
-              </Link>
             </Button>
           </div>
         </div>

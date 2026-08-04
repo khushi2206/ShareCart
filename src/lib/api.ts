@@ -12,7 +12,25 @@ export function randomId() {
   return nanoid()
 }
 
-export async function createGroup(groupFormValues: GroupFormValues) {
+export async function verifyGroupAccess(groupId: string, userId: string) {
+  const participant = await prisma.participant.findFirst({
+    where: { groupId, userId },
+  })
+  if (!participant) {
+    throw new Error('UNAUTHORIZED: You do not have access to this group.')
+  }
+  return participant
+}
+
+export async function createGroup(groupFormValues: GroupFormValues, userId?: string) {
+  const participantsData = groupFormValues.participants.map(({ name }, index) => {
+    // If a userId is provided, attach it and OWNER role to the first participant
+    if (index === 0 && userId) {
+      return { id: randomId(), name, userId, role: 'OWNER' as const }
+    }
+    return { id: randomId(), name }
+  })
+
   return prisma.group.create({
     data: {
       id: randomId(),
@@ -20,12 +38,10 @@ export async function createGroup(groupFormValues: GroupFormValues) {
       information: groupFormValues.information,
       currency: groupFormValues.currency,
       currencyCode: groupFormValues.currencyCode,
+      inviteCode: randomId(), // generate a shareable invite code
       participants: {
         createMany: {
-          data: groupFormValues.participants.map(({ name }) => ({
-            id: randomId(),
-            name,
-          })),
+          data: participantsData,
         },
       },
     },

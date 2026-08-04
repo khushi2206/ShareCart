@@ -41,8 +41,14 @@ export function GroupLayoutClient({
 
   return (
     <CurrentGroupProvider {...props}>
-      <GroupHeader />
-      {children}
+      <div className="flex flex-col md:flex-row gap-8 max-w-7xl mx-auto p-4 md:p-8 w-full">
+        <aside className="w-full md:w-64 shrink-0 border-r border-zinc-800 pr-4">
+          <GroupHeader />
+        </aside>
+        <main className="flex-1 min-w-0">
+          {children}
+        </main>
+      </div>
       <SaveGroupLocally />
     </CurrentGroupProvider>
   )
