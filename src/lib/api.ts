@@ -80,10 +80,16 @@ export async function createExpense(
     groupId,
   )
 
+  let status = 'ACTIVE'
+  if (group.approvalEnabled && expenseFormValues.amount > group.approvalThreshold) {
+    status = 'PENDING_APPROVAL'
+  }
+
   return prisma.expense.create({
     data: {
       id: expenseId,
       groupId,
+      status: status as any,
       expenseDate: expenseFormValues.expenseDate,
       categoryId: expenseFormValues.category,
       amount: expenseFormValues.amount,
@@ -210,9 +216,17 @@ export async function updateExpense(
     existingExpense.expenseDate,
   )
 
+  let status = existingExpense.status
+  if (group.approvalEnabled && expenseFormValues.amount > group.approvalThreshold) {
+    if (existingExpense.status !== 'PENDING_APPROVAL') {
+       status = 'PENDING_APPROVAL' // Needs re-approval if it was active
+    }
+  }
+
   return prisma.expense.update({
     where: { id: expenseId },
     data: {
+      status: status as any,
       expenseDate: expenseFormValues.expenseDate,
       amount: expenseFormValues.amount,
       originalAmount: expenseFormValues.originalAmount,
@@ -351,9 +365,11 @@ export async function getGroupExpenses(
       splitMode: true,
       recurrenceRule: true,
       title: true,
+      status: true,
     },
     where: {
       groupId,
+      status: 'ACTIVE',
       title: options?.filter
         ? { contains: options.filter, mode: 'insensitive' }
         : undefined,

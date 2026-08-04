@@ -89,6 +89,48 @@ export const groceryRouter = createTRPCRouter({
             participantId: participant.id,
           },
         })
+
+        // Auto-add to Pantry
+        const existingPantryItem = await prisma.pantryItem.findFirst({
+          where: {
+            groupId: input.groupId,
+            name: {
+              equals: item.name,
+              mode: 'insensitive',
+            }
+          }
+        })
+
+        if (existingPantryItem) {
+          const newQuantity = existingPantryItem.quantity + item.quantity
+          let newStatus = existingPantryItem.status
+          if (newQuantity > 0 && existingPantryItem.status === 'OUT_OF_STOCK') {
+            newStatus = 'IN_STOCK'
+          }
+          if (existingPantryItem.minQuantity && newQuantity <= existingPantryItem.minQuantity && newQuantity > 0) {
+            newStatus = 'RUNNING_LOW'
+          }
+
+          await prisma.pantryItem.update({
+            where: { id: existingPantryItem.id },
+            data: {
+              quantity: newQuantity,
+              status: newStatus,
+              purchasedDate: new Date(),
+            }
+          })
+        } else {
+          await prisma.pantryItem.create({
+            data: {
+              groupId: input.groupId,
+              name: item.name,
+              quantity: item.quantity,
+              unit: item.unit,
+              status: 'IN_STOCK',
+              addedBy: ctx.userId,
+            }
+          })
+        }
       }
 
       return item

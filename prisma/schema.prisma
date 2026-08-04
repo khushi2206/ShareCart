@@ -22,6 +22,15 @@ model Group {
   participants Participant[]
   expenses     Expense[]
   activities   Activity[]
+  pantryItems  PantryItem[]
+  chores       Chore[]
+
+  approvalEnabled             Boolean @default(false)
+  approvalThreshold           Int     @default(0)
+  approvalMinVotes            Int     @default(1)
+  approvalAllowOwnerAuto      Boolean @default(true)
+  approvalAllowRequesterVote  Boolean @default(false)
+
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @default(now()) @updatedAt
 }
@@ -35,6 +44,8 @@ model Participant {
   groupId         String
   expensesPaidBy  Expense[]
   expensesPaidFor ExpensePaidFor[]
+  choresAssigned  Chore[]
+  expenseVotes    ExpenseApprovalVote[]
 }
 
 model Category {
@@ -42,6 +53,8 @@ model Category {
   grouping String
   name     String
   Expense  Expense[]
+  PantryItem PantryItem[]
+  Chore    Chore[]
 }
 
 model Expense {
@@ -61,8 +74,13 @@ model Expense {
   groupId          String
   isReimbursement  Boolean           @default(false)
   splitMode        SplitMode         @default(EVENLY)
+  status           ExpenseStatus     @default(ACTIVE)
+  rejectionReason  String?
+  rejectedBy       String?
   createdAt        DateTime          @default(now())
   notes            String?
+
+  votes            ExpenseApprovalVote[]
 
   recurrenceRule         RecurrenceRule?       @default(NONE)
   recurringExpenseLink   RecurringExpenseLink?
@@ -184,5 +202,89 @@ model Notification {
   message   String
   isRead    Boolean          @default(false)
   createdAt DateTime         @default(now())
+}
+
+enum PantryItemStatus {
+  IN_STOCK
+  RUNNING_LOW
+  OUT_OF_STOCK
+}
+
+model PantryItem {
+  id            String           @id @default(uuid())
+  group         Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId       String
+  name          String
+  quantity      Float            @default(0)
+  unit          String?
+  category      Category?        @relation(fields: [categoryId], references: [id])
+  categoryId    Int?
+  status        PantryItemStatus @default(IN_STOCK)
+  minQuantity   Float?
+  purchasedDate DateTime         @default(now())
+  expiryDate    DateTime?
+  addedBy       String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+enum ExpenseStatus {
+  PENDING_APPROVAL
+  ACTIVE
+  REJECTED
+}
+
+enum ApprovalVoteType {
+  APPROVE
+  REJECT
+}
+
+model ExpenseApprovalVote {
+  id            String           @id @default(uuid())
+  expenseId     String
+  expense       Expense          @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  participantId String
+  participant   Participant      @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  vote          ApprovalVoteType
+  comment       String?
+  createdAt     DateTime         @default(now())
+
+  @@unique([expenseId, participantId])
+}
+
+enum ChorePriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ChoreStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+  OVERDUE
+}
+
+model Chore {
+  id              String         @id @default(uuid())
+  groupId         String
+  group           Group          @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  title           String
+  description     String?
+  assignedToId    String?
+  assignedTo      Participant?   @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
+  priority        ChorePriority  @default(MEDIUM)
+  dueDate         DateTime?
+  recurrenceRule  RecurrenceRule @default(NONE)
+  rewardPoints    Int            @default(0)
+  categoryId      Int?
+  category        Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  estimatedTime   Int?           // In minutes
+  status          ChoreStatus    @default(PENDING)
+  completedAt     DateTime?
+  createdBy       String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 }
 
