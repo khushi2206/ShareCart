@@ -110,16 +110,6 @@ export async function createExpense(
         },
       },
       isReimbursement: expenseFormValues.isReimbursement,
-      documents: {
-        createMany: {
-          data: expenseFormValues.documents.map((doc) => ({
-            id: randomId(),
-            url: doc.url,
-            width: doc.width,
-            height: doc.height,
-          })),
-        },
-      },
       notes: expenseFormValues.notes,
     },
   })
@@ -279,22 +269,6 @@ export async function updateExpense(
         delete: isDeleteRecurrenceExpenseLink,
       },
       isReimbursement: expenseFormValues.isReimbursement,
-      documents: {
-        connectOrCreate: expenseFormValues.documents.map((doc) => ({
-          create: doc,
-          where: { id: doc.id },
-        })),
-        deleteMany: existingExpense.documents
-          .filter(
-            (existingDoc) =>
-              !expenseFormValues.documents.some(
-                (doc) => doc.id === existingDoc.id,
-              ),
-          )
-          .map((doc) => ({
-            id: doc.id,
-          })),
-      },
       notes: expenseFormValues.notes,
     },
   })
@@ -377,7 +351,6 @@ export async function getGroupExpenses(
       splitMode: true,
       recurrenceRule: true,
       title: true,
-      _count: { select: { documents: true } },
     },
     where: {
       groupId,
@@ -402,7 +375,6 @@ export async function getExpense(groupId: string, expenseId: string) {
       paidBy: true,
       paidFor: true,
       category: true,
-      documents: true,
       recurringExpenseLink: true,
     },
   })
@@ -480,7 +452,6 @@ async function createRecurringExpenses() {
             paidBy: true,
             paidFor: true,
             category: true,
-            documents: true,
           },
         },
       },
@@ -505,7 +476,6 @@ async function createRecurringExpenses() {
         category,
         paidBy,
         paidFor,
-        documents,
         ...destructeredCurrentExpenseRecord
       } = currentExpenseRecord
 
@@ -526,13 +496,6 @@ async function createRecurringExpenses() {
                   })),
                 },
               },
-              documents: {
-                connect: currentExpenseRecord.documents.map(
-                  (documentRecord) => ({
-                    id: documentRecord.id,
-                  }),
-                ),
-              },
               id: newExpenseId,
               expenseDate: newExpenseDate,
               recurringExpenseLink: {
@@ -546,7 +509,6 @@ async function createRecurringExpenses() {
             // Ensure that the same information is available on the returned record that was created
             include: {
               paidFor: true,
-              documents: true,
               category: true,
               paidBy: true,
             },

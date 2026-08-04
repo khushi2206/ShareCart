@@ -18,10 +18,12 @@ model Group {
   currency     String        @default("$")
   currencyCode String?
   inviteCode   String?       @unique
+  createdBy    String?
   participants Participant[]
   expenses     Expense[]
   activities   Activity[]
   createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now()) @updatedAt
 }
 
 model Participant {
@@ -60,7 +62,6 @@ model Expense {
   isReimbursement  Boolean           @default(false)
   splitMode        SplitMode         @default(EVENLY)
   createdAt        DateTime          @default(now())
-  documents        ExpenseDocument[]
   notes            String?
 
   recurrenceRule         RecurrenceRule?       @default(NONE)
@@ -68,14 +69,6 @@ model Expense {
   recurringExpenseLinkId String?
 }
 
-model ExpenseDocument {
-  id        String   @id
-  url       String
-  width     Int
-  height    Int
-  Expense   Expense? @relation(fields: [expenseId], references: [id])
-  expenseId String?
-}
 
 enum SplitMode {
   EVENLY

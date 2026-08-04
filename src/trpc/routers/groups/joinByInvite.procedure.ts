@@ -8,7 +8,7 @@ export const joinByInviteProcedure = protectedProcedure
   .input(
     z.object({
       inviteCode: z.string(),
-      participantName: z.string().min(2),
+      participantName: z.string().min(2).optional(),
     }),
   )
   .mutation(async ({ input: { inviteCode, participantName }, ctx }) => {
@@ -31,11 +31,14 @@ export const joinByInviteProcedure = protectedProcedure
     }
 
     // Add user as MEMBER
+    const newName =
+      participantName || ctx.user?.firstName || ctx.user?.username || 'Member'
+
     await prisma.participant.create({
       data: {
         id: randomId(),
         groupId: group.id,
-        name: participantName,
+        name: newName,
         userId: ctx.userId,
         role: 'MEMBER',
       },

@@ -9,6 +9,8 @@ import { updateGroupProcedure } from '@/trpc/routers/groups/update.procedure'
 import { getGroupDetailsProcedure } from './getDetails.procedure'
 import { listGroupsProcedure } from './list.procedure'
 import { joinByInviteProcedure } from './joinByInvite.procedure'
+import { generateInviteProcedure } from './generateInvite.procedure'
+import { getDetailsByInviteCodeProcedure } from './getDetailsByInviteCode.procedure'
 
 export const groupsRouter = createTRPCRouter({
   expenses: groupExpensesRouter,
@@ -22,4 +24,6 @@ export const groupsRouter = createTRPCRouter({
   create: createGroupProcedure,
   update: updateGroupProcedure,
   joinByInvite: joinByInviteProcedure,
+  generateInvite: generateInviteProcedure,
+  getDetailsByInviteCode: getDetailsByInviteCodeProcedure,
 })
