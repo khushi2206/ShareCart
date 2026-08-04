@@ -25,7 +25,6 @@ export function GroupTabs({ groupId }: Props) {
       <TabsList className="flex flex-col h-auto w-full items-stretch bg-transparent space-y-1 p-0">
         <TabsTrigger value="expenses" className="justify-start px-4 py-2 data-[state=active]:bg-zinc-800 data-[state=active]:text-green-400">{t('Expenses.title')}</TabsTrigger>
         <TabsTrigger value="grocery" className="justify-start px-4 py-2 data-[state=active]:bg-zinc-800 data-[state=active]:text-green-400">Grocery</TabsTrigger>
-        <TabsTrigger value="bills" className="justify-start px-4 py-2 data-[state=active]:bg-zinc-800 data-[state=active]:text-green-400">Bills</TabsTrigger>
         <TabsTrigger value="balances" className="justify-start px-4 py-2 data-[state=active]:bg-zinc-800 data-[state=active]:text-green-400">{t('Balances.title')}</TabsTrigger>
         <TabsTrigger value="information" className="justify-start px-4 py-2 data-[state=active]:bg-zinc-800 data-[state=active]:text-green-400">{t('Information.title')}</TabsTrigger>
         <TabsTrigger value="analytics" className="justify-start px-4 py-2 data-[state=active]:bg-zinc-800 data-[state=active]:text-green-400">Analytics</TabsTrigger>
