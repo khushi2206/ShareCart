@@ -1,0 +1,3 @@
+postgresql://neondb_owner:npg_WjAUIR39kwYv@ep-calm-hall-ax48blz4-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_c3RhYmxlLXR1cmtleS04My5jbGVyay5hY2NvdW50cy5kZXYk
+CLERK_SECRET_KEY=sk_test_RFVMLBJMbxmONXwRSGxWv3mNVPZlYbN9lrAaaJ4K1Y
